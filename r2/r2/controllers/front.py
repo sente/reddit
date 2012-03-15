@@ -220,7 +220,8 @@ class FrontController(RedditController):
         # check if we just came from the submit page
         infotext = None
         if request.get.get('already_submitted'):
-            infotext = strings.already_submitted % article.resubmit_link()
+            title = request.get.get('title')
+            infotext = strings.already_submitted % article.resubmit_link(link_title = title)
 
         check_cheating('comments')
 

@@ -240,7 +240,8 @@ class ApiController(RedditController):
                 pass
             elif form.has_errors("url", errors.ALREADY_SUB):
                 check_domain = False
-                u = url[0].already_submitted_link
+                #u = url[0].already_submitted_link
+                u = url[0].already_submitted_link_with_title(title)
                 if extension:
                     u = UrlParser(u)
                     u.set_extension(extension)
