@@ -238,15 +238,20 @@ class ApiController(RedditController):
             # check for no url, or clear that error field on return
             if form.has_errors("url", errors.NO_URL, errors.BAD_URL):
                 pass
+
             elif form.has_errors("url", errors.ALREADY_SUB):
                 check_domain = False
-                #u = url[0].already_submitted_link
-                u = url[0].already_submitted_link_with_title(title)
+
+                u = UrlParser(url[0].make_permalink_slow())
+
+                u.update_query(title=title,
+                               sr=sr.name,
+                               already_submitted='true')
                 if extension:
-                    u = UrlParser(u)
                     u.set_extension(extension)
-                    u = u.unparse()
-                form.redirect(u)
+
+                form.redirect(u.unparse())
+
             # check for title, otherwise look it up and return it
             elif form.has_errors("title", errors.NO_TEXT):
                 pass

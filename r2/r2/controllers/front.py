@@ -19,6 +19,7 @@
 # All portions of the code written by CondeNet are Copyright (c) 2006-2010
 # CondeNet, Inc. All Rights Reserved.
 ################################################################################
+import sys
 from validator import *
 from pylons.i18n import _, ungettext
 from reddit_base import RedditController, base_listing, paginated_listing, prevent_framing_and_css
@@ -221,7 +222,19 @@ class FrontController(RedditController):
         infotext = None
         if request.get.get('already_submitted'):
             title = request.get.get('title')
-            infotext = strings.already_submitted % article.resubmit_link(link_title = title)
+            subreddit = request.get.get('sr')
+
+            base_url  = article.subreddit_slow.path if subreddit else '/'
+            base_url += 'submit'
+
+            u = UrlParser(base_url)
+            u.update_query(resubmit = 'true',
+                           sr_url = 'true',
+                           url = article.url,
+                           title = title)
+
+            submit_url = u.unparse()
+            infotext = strings.already_submitted % submit_url
 
         check_cheating('comments')
 
@@ -766,13 +779,15 @@ class FrontController(RedditController):
         """Submit form."""
         resubmit = request.get.get('resubmit')
         if url and not resubmit:
+
             # check to see if the url has already been submitted
             links = link_from_url(url)
             if links and len(links) == 1:
-                return self.redirect(links[0].already_submitted_link)
+                return self.redirect(links[0].make_permalink_slow() + '?already_submitted=true')
+
             elif links:
                 infotext = (strings.multiple_submitted
-                            % links[0].resubmit_link())
+                            % links[0].make_permalink_slow() + '?already_submitted=true')
                 res = BoringPage(_("seen it"),
                                  content = wrap_links(links),
                                  infotext = infotext).render()

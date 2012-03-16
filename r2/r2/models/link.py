@@ -105,21 +105,6 @@ class Link(Thing, Printable):
             LinksByUrl._set_values(LinksByUrl._key_from_url(self.url),
                                    {self._id36: ''})
 
-    @property
-    def already_submitted_link(self):
-        return self.make_permalink_slow() + '?already_submitted=true'
-
-    def already_submitted_link_with_title(self, title=''):
-        u = self.make_permalink_slow() + '?already_submitted=true'
-        u += '&title=' + url_escape(title)
-        return u
-
-    def resubmit_link(self, sr_url = False, link_title = ''):
-        submit_url  = self.subreddit_slow.path if sr_url else '/'
-        submit_url += 'submit?resubmit=true&url=' + url_escape(self.url)
-        submit_url += '&title=' + url_escape(link_title)
-        return submit_url
-
     @classmethod
     def _submit(cls, title, url, author, sr, ip, spam=False):
         from r2.models import admintools
